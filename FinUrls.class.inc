@@ -2,24 +2,28 @@
 
 class FinUrls
 {
-    private $_allGoodSym = '*';
-    private $_goodSym = '+';
-    private $_okSym = '-';
-    private $_badSym = 'o';
+    private $_allGood = '*';
+    private $_good = '+';
+    private $_ok = '-';
+    private $_bad = 'o';
     private $_data_host = "http://chartapi.finance.yahoo.com";
     //    private $_data_range = "/instrument/1.0/{0}/chartdata;type={1};range={2}/csv/";
     //    private $_data_yearly = "/instrument/1.0/{0}/chartdata;type={1};ys={2};yz={3}/csv/";
     private $_mdata;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->_mdata = array();
     }
 
-    public function allGoodSym() { return $this->_allGoodSym; }
-    public function goodSym() { return $this->_goodSym; }
-    public function okSym() { return $this->_okSym; }
-    public function badSym() { return $this->_badSym; }
+    // make sure it's a new array every time
+    public function clean() {
+        $this->_mdata = array();
+    }
+
+    public function allGoodSym() { return $this->_allGood; }
+    public function goodSym() { return $this->_good; }
+    public function okSym() { return $this->_ok; }
+    public function badSym() { return $this->_bad; }
 
     public function mdata() { print_r($this->_mdata); }
 
@@ -60,10 +64,23 @@ class FinUrls
 //         echo '</pre>';
 //     }
 
+    public function myprarray($data) {
+        $str = '';
+        foreach($data as $k => $v) {
+            $str .= '[';
+            // foreach ($d as $v) {
+            //     $str .= $v;
+            // }
+            $str .= $k . ',' . $v;
+            $str .= '], ';
+        }
+        error_log($str);
+    }
+
     public function storeData($symbol, $type, $range, $period=null)
     {
         $url = $this->dataRange($symbol, $type, $range, $period);
-        error_log('url: ' . $url);
+        error_log('url: ' . $symbol . '(' . $type . ($period ? ',' . $period : '') . ')');
         $data = file_get_contents($url);
         $lines = explode('
 ', $data);
@@ -118,21 +135,22 @@ class FinUrls
                 || !array_key_exists('macd', $d)
                 || !array_key_exists('signal', $d))
                 continue;
+            //            $this->myprarray($d);
             $mid = $d['upper'] - ($d['upper'] - $d['lower'])/2;
 
             if ($d['ema10'] > $d['ema20']
                 && $d['close'] > $d['ema10']
-                && $d['close'] > $mid
+                //                && $d['close'] > $mid
                 && $d['macd'] > $d['signal']
                 && $d['macd'] > 0) {
-                $res .= ' ' . $this->_allGoodSym;
+                $res .= ' ' . $this->_allGood;
             } else if ($d['ema10'] > $d['ema20']) {
-                $res .= ' ' . $this->_goodSym;
+                $res .= ' ' . $this->_good;
             } else if ($d['macd'] > $d['signal']
                      && $d['close'] > $mid) {
-                $res .= ' ' . $this->_okSym;
+                $res .= ' ' . $this->_ok;
             } else {
-                $res .= ' ' . $this->_badSym;
+                $res .= ' ' . $this->_bad;
             }
         }
         // returns the string with the pass/no-pass days
@@ -143,7 +161,7 @@ class FinUrls
     {
         $n = 0;
         $pos = count($data)-1;
-        while ($data[$pos] === $this->_allGoodSym)
+        while ($data[$pos] === $this->_allGood)
         {
             $n++;
             $pos--;

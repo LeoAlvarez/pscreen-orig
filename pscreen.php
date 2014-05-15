@@ -71,16 +71,18 @@ $firstseen = false;
 foreach ($syms as $sym) {
     error_log($sym . '-> ' . date('h:i:s A'));
     set_time_limit(100); // will this work?
+    $finurl->clean();
     $sh->symbolData($finurl, $sym, $range);
     // replace the o & t's with the column mockup
     $symdata = $finurl->checkData();
     $dta = explode(' ', $symdata);
+    $ndta = count($dta);
 
     // success for one is not success for the other!
-    $success = ($dta[count($dta)-1] == $finurl->allGoodSym() ? true : false);
-    $success2 = ($dta[count($dta)-1] == $finurl->okSym() ? true : false);
+    $success = ($dta[$ndta-1] == $finurl->allGoodSym() ? true : false);
+    $success2 = ($dta[$ndta-1] == $finurl->okSym() ? true : false);
     $lastGoodDays = $finurl->numLastSuccessDays($dta);
-    error_log('symdata: ' . $sym . ' ' . $symdata . ' [ ' . $lastGoodDays . ' ] ');
+    error_log('symdata: ' . $sym . ' ' . $symdata . ' [ ' . $lastGoodDays . ' ] ' . ' => tot: ' . $ndta);
 //     $finurl->mdata();
         
     // replace with table cells

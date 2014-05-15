@@ -29,7 +29,7 @@ class screenerHelper
 
     public function yfcLink($sym)
     {
-        $url = 'http://finance.yahoo.com/echarts?s=' . $sym . '+Interactive#symbol=aapl;range=6m;compare=;indicator=ema%2810,20)+bollinger+volume+macd;charttype=ohlc;crosshair=on;ohlcvalues=0;logscale=off;source=';
+        $url = 'http://finance.yahoo.com/echarts?s=' . $sym . '+Interactive#range=6m;compare=;indicator=ema%2810,20)+bollinger+volume+macd;charttype=ohlc;crosshair=on;ohlcvalues=0;logscale=off;source=';
         return '<a href="' . $url . '" target="_ychart"><img src="yahoo_favicon.png"></a>';
     }
 
